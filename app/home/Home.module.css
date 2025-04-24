@@ -7,7 +7,7 @@
     background-repeat: no-repeat;
     padding: 2rem;
     background-attachment: fixed;
-    background-image: url('/parma.jpg');
+    background-image: url('/rii.jpg');
     font-family: 'Courier New', Courier, monospace; 
     
 }
@@ -104,7 +104,7 @@
 }
 
 .buttonNav {
-    background: linear-gradient(135deg, #d36f22, #e6cf3c);
+    background: linear-gradient(135deg, #5aa871, #242525);
      
 }
 

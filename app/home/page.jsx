@@ -85,7 +85,7 @@ export default function Home() {
         setSearch("");
         setPage(1);
         fetchCharacters("", 1);
-        toast.success("Filtro foi resetado", { position: "top-left" });
+        toast.success("Filtro foi resetado", { position: "top-right" });
     };
 
     const handleCardClick = (char) => {
@@ -98,7 +98,7 @@ export default function Home() {
 
     return (
         <div className={styles.container}>
-            <ToastContainer position="top-rigth" autoClose={7500} theme="colored"   toastStyle={{ backgroundColor: "lightgreen", color: "white" }} />
+            <ToastContainer position="top-rigth" autoClose={7500} theme="colored"   toastStyle={{ backgroundColor: "black", color: "green" }} />
             <h1 className={styles.title}>Personagens de Rick and Morty🧩</h1>
             <div className={styles.controls}>
                 <input type="text" placeholder="Buscar por nome" value={search} onChange={(e) => setSearch(e.target.value)} className={styles.input} />

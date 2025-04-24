@@ -9,8 +9,8 @@ export default function CharacterCard({ character, onClick }) {
                 className={styles.avatar}
             />
             <h3 className={styles.title}>{character.name}</h3>
-            <p>{character.status}</p>
-            <p>{character.species}</p>
+            <p className={styles.status}>{character.status}</p>
+            <p className={styles.species}>{character.species}</p>
         </div>
     );
 }
