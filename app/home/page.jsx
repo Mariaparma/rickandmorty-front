@@ -1,38 +1,80 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import CharacterCard from "../../components/CharacterCard";
-import styles from "../home/Home.module.css";
+import styles from "./Home.module.css";
 import axios from "axios";
+import { useEffect, useState, useRef } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import CharacterCard from "../../components/CharacterCard";
+import Loader from "../../components/Loader";
 
 export default function Home() {
-    const [search, setSearch] = useState("");
     const [characters, setCharacters] = useState([]);
     const [notFound, setNotFound] = useState(false);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const cacheRef = useRef(new Map());
+    const [search, setSearch] = useState("");
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
 
     const fetchCharacters = async (name = "", pageNumber = 1) => {
         setLoading(true);
-        try {
-            const { data } = await axios.get(`https://rickandmortyapi.com/api/character/?page=${pageNumber}&name=${name}`);
-            setCharacters(data.results);
-            setTotalPages(data.info.pages);
+        const cache = cacheRef.current;
+        const cacheKey = `${name}_${pageNumber}`;
+        const nextPageNumber = pageNumber + 1;
+        const nextCacheKey = `${name}_${nextPageNumber}`;
+
+        const cleanCacheIfNeeded = () => {
+            while (cache.size >= 5) {
+                const firstKey = cache.keys().next().value;
+                cache.delete(firstKey);
+            }
+        };
+
+        let total = totalPages;
+
+        if (cache.has(cacheKey)) {
+            const cached = cache.get(cacheKey);
+            setCharacters(cached.results);
+            setTotalPages(cached.totalPages);
+            total = cached.totalPages;
             setNotFound(false);
-        } catch {
-            setNotFound(true);
-            setCharacters([]);
-        } finally {
             setLoading(false);
+        } else {
+            try {
+                const { data } = await axios.get(`https://rickandmortyapi.com/api/character/?page=${pageNumber}&name=${name}`);
+                cleanCacheIfNeeded();
+                cache.set(cacheKey, {
+                    results: data.results,
+                    totalPages: data.info.pages,
+                });
+                setCharacters(data.results);
+                setTotalPages(data.info.pages);
+                total = data.info.pages;
+                setNotFound(false);
+            } catch {
+                setCharacters([]);
+                setNotFound(true);
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        if (nextPageNumber <= total && !cache.has(nextCacheKey)) {
+            try {
+                const res = await axios.get(`https://rickandmortyapi.com/api/character/?page=${nextPageNumber}&name=${name}`);
+                cleanCacheIfNeeded();
+                cache.set(nextCacheKey, {
+                    results: res.data.results,
+                    totalPages: res.data.info.pages,
+                });
+            } catch (err) {}
         }
     };
 
     useEffect(() => {
-        fetchCharacters(search, page);
-    }, [search, page]);
+        fetchCharacters();
+    }, []);
 
     const handleSearch = () => {
         setPage(1);
@@ -46,72 +88,50 @@ export default function Home() {
         toast.success("Filtro foi resetado", { position: "top-left" });
     };
 
-    const handleCardClick = (name) => {
-        toast.success(`Você clicou em ${name}`, {});
+    const handleCardClick = (char) => {
+        toast.info(`Você clicou em ${char.name} que está ${char.status}`);
     };
+
+    useEffect(() => {
+        fetchCharacters(search, page);
+    }, [page]);
 
     return (
         <div className={styles.container}>
-            <ToastContainer 
-                position="top-right"
-                autoClose={7500}
-                theme="light"
-            />
-            <h1 className={styles.title}>Personagens de Rick and Morty 🧩</h1>
+            <ToastContainer position="top-right" autoClose={7500} theme="light" />
+            <h1 className={styles.title}>Personagens de Rick and Morty🧩</h1>
             <div className={styles.controls}>
-                <input
-                    type="text"
-                    placeholder="Buscar por nome"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    className={styles.input}
-                />
-                <button
-                    onClick={handleSearch}
-                    className={styles.buttonSearch}
-                >
+                <input type="text" placeholder="Buscar por nome" value={search} onChange={(e) => setSearch(e.target.value)} className={styles.input} />
+                <button onClick={handleSearch} className={styles.buttonSearch}>
                     Buscar
                 </button>
-                <button
-                    onClick={handleReset}
-                    className={styles.buttonReset}
-                >
+                <button onClick={handleReset} className={styles.buttonReset}>
                     Resetar
                 </button>
-
-                <div className={styles.navControls}>
-                    <button 
-                        onClick={() => setPage((p) => Math.max(p - 1, 1))} 
-                        disabled={page === 1 || notFound || loading} 
-                        className={styles.buttonNav}
-                    >
-                        Página Anterior
-                    </button>
-
-                    <span className={styles.pageIndicator}>
-                        Página {page} de {totalPages}
-                    </span>
-
-                    <button 
-                        onClick={() => setPage((p) => Math.min(p + 1, totalPages))} 
-                        disabled={page === totalPages || notFound || loading} 
-                        className={styles.buttonNav}
-                    >
-                        Próxima Página
-                    </button>
-                </div>
             </div>
-            {loading && <h1 className={styles.loading}>Carregando...</h1>}
+            <div className={styles.navControls}>
+                <button onClick={() => setPage((p) => Math.max(p - 1, 1))} disabled={page === 1 || notFound} className={styles.buttonNav}>
+                    Página Anterior
+                </button>
+                <span className={styles.pageIndicator}>
+                    Página {page} de {totalPages}
+                </span>
+                <button onClick={() => setPage((p) => Math.min(p + 1, totalPages))} disabled={page === totalPages || notFound} className={styles.buttonNav}>
+                    Próxima Página
+                </button>
+            </div>
             {notFound && <h1 className={styles.notFound}>Nenhum personagem encontrado 😢</h1>}
-            <div className={styles.grid}>
-                {characters.map((char) => (
-                    <CharacterCard
-                        key={char.id}
-                        character={char}
-                        onClick={() => handleCardClick(char.name)}
-                    />
-                ))}
-            </div>
+            {loading ? (
+                <div className={`${styles.loaderWrapper} ${loading ? "" : styles.hidden}`}>
+                    <Loader />
+                </div>
+            ) : (
+                <div className={styles.grid}>
+                    {characters.map((char) => (
+                        <CharacterCard key={char.id} character={char} onClick={() => handleCardClick(char)} />
+                    ))}
+                </div>
+            )}
         </div>
     );
 }
