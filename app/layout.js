@@ -5,10 +5,11 @@ import "./globals.css";
 			};
 			export default function RootLayout({ children }) {
 				return (
-					<html>
-						<body>
-              {children}
-              </body>
-					</html>
-);
-		}
+				  <html>
+					<head>
+					  <link rel="icon" href="./icons8-rick-e-morty-32.png" />
+					</head>
+					<body>{children}</body>
+				  </html>
+			  );
+			  }
