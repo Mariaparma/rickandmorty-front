@@ -42,11 +42,11 @@
 }
 
 .input::placeholder {
-    color: #dddddd;
+    color: #2ebe63;
 }
 
 .input:focus {
-    border-color: #00c6ff;
+    border-color: #359c84;
     box-shadow: 0 0 0 3px rgba(0, 198, 255, 0.3);
 }
 
@@ -65,28 +65,46 @@
     color: white;
     font-family: 'Courier New', Courier, monospace; 
 }
-
 .buttonSearch {
-    background: linear-gradient(135deg, #28a745, #34d058);
+  background: linear-gradient(135deg, #4caf50, #81c784); 
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .buttonSearch:hover {
-    background: linear-gradient(135deg, #218838, #28a745);
-    transform: scale(1.03);
+  background: linear-gradient(135deg, #388e3c, #66bb6a);
+  transform: scale(1.03);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);
 }
 
 .buttonReset {
-    background: linear-gradient(135deg, #dc3545, #ff5e6c);
+  background: linear-gradient(135deg, #e4100d, #ef9a9a); 
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .buttonReset:hover {
-    background: linear-gradient(135deg, #c82333, #dc3545);
-    transform: scale(1.03);
-    
+  background: linear-gradient(135deg, #c62828, #e57373); 
+  transform: scale(1.03);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);
 }
 
 .buttonNav {
-    background: linear-gradient(135deg, #00c6ff, #0072ff);
+    background: linear-gradient(135deg, #d36f22, #e6cf3c);
      
 }
 
@@ -126,7 +144,7 @@
 .notFound {
     font-size: 2rem;
     text-align: center;
-    color: tomato;
+    color: rgb(255, 255, 255);
     margin-top: 4rem;
     text-shadow: 1px 1px 3px black;
 }
